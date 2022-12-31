@@ -1,25 +1,25 @@
 import getDurations from "./durationsArray.js";
+import getRandom from "./getRandom.js";
+import makeCopiesOfArr from "./makeCopiesOfArr.js";
 import getNotesArray from "./notesArray.js";
+import setVolume from "./setVolume.js";
 
 function startProgram() {
-  let durations = getDurations(80, 1);
-  console.log(durations);
-  let melodyNotes = getNotesArray("d3", 10, "major");
-  console.log(melodyNotes);
+  let durations = getDurations(150, 1);
+  let melodyNotes = getNotesArray("f3", 8, "major");
+
+  const [savedMelodyNotes, savedDurations] = makeCopiesOfArr(
+    melodyNotes,
+    durations
+  );
 
   const context = new AudioContext();
-
-  const gainMelodyNode = context.createGain();
-  gainMelodyNode.gain.setValueAtTime(0.1, context.currentTime);
-  gainMelodyNode.connect(context.destination);
-
-  const savedMelodyNotes = [...melodyNotes];
-  const savedDurations = [...durations];
+  const gainMelodyNode = setVolume(context, 0.3);
 
   var myFunction = function () {
-    let randomForNote = Math.floor(Math.random() * melodyNotes.length - 1) + 1;
-    let randomForDuration =
-      Math.floor(Math.random() * durations.length - 1) + 1;
+
+    let randomForNote = getRandom(0, melodyNotes.length - 1);
+    let randomForDuration = getRandom(0, durations.length - 1);
 
     const oscillator = context.createOscillator();
     oscillator.type = "triangle";
@@ -29,23 +29,22 @@ function startProgram() {
     );
     oscillator.connect(gainMelodyNode);
     oscillator.start();
-
     oscillator.stop(
       context.currentTime +
         durations[randomForDuration] / 1000 -
         durations[randomForDuration] / 10000
     );
-
-    setTimeout(() => {
-      myFunction();
-    }, durations[randomForDuration]);
-
+// updateArrays()
     melodyNotes.length > 1
       ? melodyNotes.splice(randomForNote, 1)
       : (melodyNotes = [...savedMelodyNotes]);
     durations.length > 1
       ? durations.splice(randomForDuration, 1)
       : (durations = [...savedDurations]);
+
+    setTimeout(() => {
+      myFunction();
+    }, durations[randomForDuration]);
   };
 
   setTimeout(() => {
