@@ -22,7 +22,7 @@ function startProgram() {
     let randomForDuration = getRandom(0, durations.length - 1);
 
     const oscillator = context.createOscillator();
-    oscillator.type = "triangle";
+    oscillator.type = "sin";
     oscillator.frequency.setValueAtTime(
       melodyNotes[randomForNote],
       context.currentTime
